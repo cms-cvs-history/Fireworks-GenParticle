@@ -14,22 +14,18 @@
 //
 // Original Author:
 //         Created:  Thu Dec  6 18:01:21 PST 2007
-// $Id: FWGenParticle3DProxyBuilder.cc,v 1.2 2010/01/22 19:52:57 amraktad Exp $
+// $Id: FWGenParticle3DProxyBuilder.cc,v 1.3 2010/01/22 20:56:59 amraktad Exp $
 //
 
 // system include files
-#include "TEveManager.h"
+
+// user include files
 #include "TEveTrack.h"
-#include "RVersion.h"
 #include "TDatabasePDG.h"
-#include "TEveVSDStructs.h"
-#include "TRandom.h"
-#include "TEveStraightLineSet.h"
 #include "TEveVSDStructs.h"
 
 #include "Fireworks/Core/interface/FWEventItem.h"
-#include "Fireworks/Core/interface/FW3DDataProxyBuilder.h"
-
+#include "Fireworks/Core/interface/FWProxyBuilderBase.h"
 
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
@@ -38,7 +34,7 @@
 class TEveTrack;
 class TEveTrackPropagator;
 
-class FWGenParticle3DProxyBuilder : public  FW3DDataProxyBuilder {
+class FWGenParticle3DProxyBuilder : public  FWProxyBuilderBase {
 
 public:
    FWGenParticle3DProxyBuilder();
@@ -73,11 +69,7 @@ void FWGenParticle3DProxyBuilder::build(const FWEventItem* iItem, TEveElementLis
    iItem->get(genParticles);
    if(0 == genParticles ) return;
 
-   if(0==*product) {
-      *product = new TEveElementList();
-   } else {
-      (*product)->DestroyElements();
-   }
+   (*product)->DestroyElements();
    TEveElementList* tlist = *product;
 
    int index=0;
@@ -108,8 +100,9 @@ void FWGenParticle3DProxyBuilder::build(const FWEventItem* iItem, TEveElementLis
       track->SetTitle(s);
       track->MakeTrack();
       tlist->AddElement(track);
+      tlist->ProjectChild(track);
    }
 }
 
-REGISTER_FW3DDATAPROXYBUILDER(FWGenParticle3DProxyBuilder,reco::GenParticleCollection,"GenParticles");
+REGISTER_FWPROXYBUILDER(FWGenParticle3DProxyBuilder,reco::GenParticleCollection,"GenParticles", FWViewType::k3DBit | FWViewType::kRhoPhiBit  | FWViewType::kRhoZBit);
 
